@@ -1,8 +1,13 @@
+'use client';
+
 import Image from "next/image";
 import styles from "./page.module.css";
 import { Box, Button } from "@chakra-ui/react";
+import { RestfulApiContext } from '../hooks/RestfulApiContext'
+import React from "react";
 
 export default function Home() {
+  const { testContext } = React.useContext(RestfulApiContext);
   return (
     <div className={styles.page}>
       <main className={styles.main}>
@@ -91,7 +96,9 @@ export default function Home() {
           Go to nextjs.org →
         </a>
       </footer>
-      <Button>hi</Button>
+      <Button onClick={() => {
+        testContext();
+      }}>hi</Button>
     </div>
   );
 }
