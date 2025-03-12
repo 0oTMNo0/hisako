@@ -1,10 +1,15 @@
-'use client';
-
 import React from 'react';
 import axios from 'axios';
-import { DELETE, GET, POST, PUT, BASE_URL } from '../constants/Global';
+import {
+  DELETE,
+  GET,
+  POST,
+  PUT,
+  BASE_URL,
+  IServiceCall,
+} from '@/constants/Global';
 
-const postLogin = (queryParams, pathParams, body) => {
+const postLogin: IServiceCall = (queryParams, pathParams, body) => {
   return axios({
     method: POST,
     url: BASE_URL + `/api/auth/login/`,
@@ -17,7 +22,7 @@ const postLogin = (queryParams, pathParams, body) => {
   });
 };
 
-const postRefresh = (queryParams, pathParams, body) => {
+const postRefresh: IServiceCall = (queryParams, pathParams, body) => {
   return axios({
     method: POST,
     url: BASE_URL + `/api/auth/refresh/`,
@@ -34,9 +39,9 @@ const testContext = () => {
   console.log('hiiiiiii');
 };
 
-export const RestfulApiContext = React.createContext(null);
+export const RestfulApiContext = React.createContext<any | null>(null);
 
-export const RestfulApiProvider = (props) => {
+export const RestfulApiProvider = (props: any) => {
   return (
     <RestfulApiContext.Provider value={{ postLogin, postRefresh, testContext }}>
       {props.children}
