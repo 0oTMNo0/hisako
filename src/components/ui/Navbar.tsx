@@ -1,28 +1,59 @@
 import React from 'react';
-import { Box, Text, Input, Button, Icon } from '@chakra-ui/react';
-// import { SearchIcon } from '@chakra-ui/icons';
-import { HiHeart } from 'react-icons/hi';
-import { Search2Icon } from '@chakra-ui/icons';
+import { Box, Text, Input, Button, Icon, Flex, Link } from '@chakra-ui/react';
 import { IconSearch } from '@/assets/icons';
+import { InputGroup } from './input-group';
+import { Link as ReactRouterLink, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
+  const navigate = useNavigate();
+
   return (
-    <Box w="100%" py={4} px={6} boxShadow="sm" h={100}>
-      {/* Desktop Navbar */}
-      <Text fontSize="xl" fontWeight="bold">
+    <Flex
+      w="100%"
+      py={4}
+      px={6}
+      boxShadow="sm"
+      h={100}
+      direction={'row'}
+      alignItems={'center'}
+      justifyContent={'space-between'}
+      background={'white'}
+    >
+      <Flex
+        direction={'row'}
+        gap={15}
+        alignItems={'center'}
+        sm={{ display: 'flex' }}
+        display={'none'}
+      >
+        {/* Desktop Navbar */}
+        <Text fontSize="xl" fontWeight="bold" color={'red'}>
+          HISAKO
+        </Text>
+        <Text cursor="pointer" color={'black'}>
+          SHOP
+        </Text>
+        <Text cursor="pointer" color={'black'}>
+          ABOUT
+        </Text>
+
+        <InputGroup flex="1" startElement={<IconSearch />}>
+          <Input placeholder="Search contacts" />
+        </InputGroup>
+      </Flex>
+
+      <Text
+        fontSize="xl"
+        fontWeight="bold"
+        sm={{ display: 'none' }}
+        display={'flex'}
+        color={'black'}
+      >
         HISAKO
       </Text>
-      <Text cursor="pointer">SHOP</Text>
-      <Text cursor="pointer">ABOUT</Text>
-      <Icon size="lg" color="pink.700">
-        {/* <SearchIcon /> */}
-        {/* <Search2Icon /> */}
-        <IconSearch />
-      </Icon>
-      {/* <Input placeholder="SEARCH" variant="outline" size="sm" /> */}
 
-      <Button variant="ghost">LOGIN</Button>
-    </Box>
+      <Button onClick={() => navigate('/login')}>LOGIN</Button>
+    </Flex>
   );
 };
 
