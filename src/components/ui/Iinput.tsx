@@ -9,7 +9,15 @@ export interface IInputProps extends ChakraPropsType {}
 
 const IInput: React.FC<IInputProps> = (props) => {
   return (
-    <Input placeholder="email" size="lg" borderRadius={'none'} {...props} />
+    <Input
+      placeholder="email"
+      size="lg"
+      borderRadius={'none'}
+      background={'background.1'}
+      fontSize={14}
+      color={'black'}
+      {...props}
+    />
   );
 };
 

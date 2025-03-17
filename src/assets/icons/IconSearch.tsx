@@ -1,6 +1,6 @@
-import { Icon } from '@chakra-ui/react';
+import { Icon, IconProps } from '@chakra-ui/react';
 
-const SvgComponent = (props: any) => {
+const SvgComponent: React.FC<IconProps> = (props) => {
   return (
     <Icon size="lg" color="red.500">
       <svg
