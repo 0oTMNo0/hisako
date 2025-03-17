@@ -30,10 +30,10 @@ const Navbar = () => {
         <Text fontSize="xl" fontWeight="bold" color={'red'}>
           HISAKO
         </Text>
-        <Text cursor="pointer" color={'black'}>
+        <Text cursor="pointer" color="brand.300">
           SHOP
         </Text>
-        <Text cursor="pointer" color={'black'}>
+        <Text cursor="pointer" color={'red'}>
           ABOUT
         </Text>
 
