@@ -1,14 +1,12 @@
 import Ibutton from '@/components/ui/Ibutton';
 import IInput from '@/components/ui/Iinput';
 import Ititle from '@/components/ui/Ititle';
-import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { Flex, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const CreateAccount = () => {
   const navigate = useNavigate();
-  const { testContext } = React.useContext(RestfulApiContext);
 
   return (
     <Flex direction={'column'} h={'100vh'} background={'background.1'}>
@@ -39,39 +37,31 @@ const Login = () => {
           alignItems={'center'}
         >
           <Text fontSize="xl" color={'black'} my={35}>
-            Login
+            CREATE ACCOUNT
           </Text>
           <IInput placeholder="email" size="lg" mb={30} />
           <IInput placeholder="password" size="lg" mb={15} />
-          <Text
-            onClick={() => navigate('/login/ResetPassword')}
-            fontSize={'2xs'}
-            color={'black'}
-            mb={35}
-            cursor={'pointer'}
-          >
-            FORGOTTEN PASSWORD?
+          <Text fontSize={'2xs'} color={'black'} mb={15}>
+            CONFIRM PASSWORD
           </Text>
+          <IInput placeholder="password" size="lg" mb={35} />
           <Ibutton
             w={'full'}
             size="xl"
             bgColor={'secondary.500'}
             color={'white'}
             mb={15}
-            onClick={() =>
-              navigate('/success', { state: { msg: 'Your message here' } })
-            }
           >
-            SIGN IN
+            CREATE ACCOUNT
           </Ibutton>
           <Text
             fontSize={'2xs'}
             color={'white'}
             cursor={'pointer'}
             mb={35}
-            onClick={() => navigate('/createAccount')}
+            onClick={() => navigate('/login')}
           >
-            CREATE NEW ACCOUNT
+            I already have account
           </Text>
         </Flex>
       </Flex>
@@ -79,4 +69,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default CreateAccount;

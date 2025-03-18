@@ -4,11 +4,12 @@ import Ititle from '@/components/ui/Ititle';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { Flex, Text } from '@chakra-ui/react';
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const Success = () => {
   const navigate = useNavigate();
-  const { testContext } = React.useContext(RestfulApiContext);
+  const location = useLocation();
+  const msg = location.state?.msg || 'Default message';
 
   return (
     <Flex direction={'column'} h={'100vh'} background={'background.1'}>
@@ -26,10 +27,10 @@ const Login = () => {
       </Flex>
 
       <Flex
-        // alignItems={'center'}
+        alignItems={'center'}
         justifyContent={'center'}
         background={'primary.500'}
-        h={'3/5'}
+        h={'full'}
       >
         <Flex
           direction={'column'}
@@ -38,19 +39,18 @@ const Login = () => {
           w={'full'}
           alignItems={'center'}
         >
-          <Text fontSize="xl" color={'black'} my={35}>
-            Login
+          <Text fontSize="xl" color={'black'} fontWeight={'bold'}>
+            SUCCESS
           </Text>
-          <IInput placeholder="email" size="lg" mb={30} />
-          <IInput placeholder="password" size="lg" mb={15} />
           <Text
             onClick={() => navigate('/login/ResetPassword')}
             fontSize={'2xs'}
             color={'black'}
+            mt={23}
             mb={35}
             cursor={'pointer'}
           >
-            FORGOTTEN PASSWORD?
+            {msg}
           </Text>
           <Ibutton
             w={'full'}
@@ -58,25 +58,14 @@ const Login = () => {
             bgColor={'secondary.500'}
             color={'white'}
             mb={15}
-            onClick={() =>
-              navigate('/success', { state: { msg: 'Your message here' } })
-            }
+            onClick={() => navigate('/')}
           >
-            SIGN IN
+            CONTINUE
           </Ibutton>
-          <Text
-            fontSize={'2xs'}
-            color={'white'}
-            cursor={'pointer'}
-            mb={35}
-            onClick={() => navigate('/createAccount')}
-          >
-            CREATE NEW ACCOUNT
-          </Text>
         </Flex>
       </Flex>
     </Flex>
   );
 };
 
-export default Login;
+export default Success;

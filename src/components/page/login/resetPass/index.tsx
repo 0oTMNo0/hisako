@@ -6,7 +6,7 @@ import { Flex, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Login = () => {
+const ResetPass = () => {
   const navigate = useNavigate();
   const { testContext } = React.useContext(RestfulApiContext);
 
@@ -29,7 +29,7 @@ const Login = () => {
         // alignItems={'center'}
         justifyContent={'center'}
         background={'primary.500'}
-        h={'3/5'}
+        h={'full'}
       >
         <Flex
           direction={'column'}
@@ -38,45 +38,27 @@ const Login = () => {
           w={'full'}
           alignItems={'center'}
         >
-          <Text fontSize="xl" color={'black'} my={35}>
-            Login
+          <Text fontSize="xl" color={'black'} mt={35}>
+            RESET PASSWORD
+          </Text>
+          <Text fontSize={'2xs'} color={'black'} my={22}>
+            ENTER EMAIL FOR RECOVERY INSTRUCTIONS
           </Text>
           <IInput placeholder="email" size="lg" mb={30} />
-          <IInput placeholder="password" size="lg" mb={15} />
-          <Text
-            onClick={() => navigate('/login/ResetPassword')}
-            fontSize={'2xs'}
-            color={'black'}
-            mb={35}
-            cursor={'pointer'}
-          >
-            FORGOTTEN PASSWORD?
-          </Text>
           <Ibutton
             w={'full'}
             size="xl"
             bgColor={'secondary.500'}
             color={'white'}
             mb={15}
-            onClick={() =>
-              navigate('/success', { state: { msg: 'Your message here' } })
-            }
+            onClick={() => testContext()}
           >
-            SIGN IN
+            CONTINUE
           </Ibutton>
-          <Text
-            fontSize={'2xs'}
-            color={'white'}
-            cursor={'pointer'}
-            mb={35}
-            onClick={() => navigate('/createAccount')}
-          >
-            CREATE NEW ACCOUNT
-          </Text>
         </Flex>
       </Flex>
     </Flex>
   );
 };
 
-export default Login;
+export default ResetPass;

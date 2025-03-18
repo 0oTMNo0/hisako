@@ -7,6 +7,7 @@ import Ititle from './Ititle';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = React.useState(false);
 
   return (
     <Flex h={92} background={'background.1'} px={30} justifyContent={'center'}>
