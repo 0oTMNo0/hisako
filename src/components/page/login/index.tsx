@@ -2,20 +2,43 @@ import Ibutton from '@/components/ui/Ibutton';
 import IInput from '@/components/ui/Iinput';
 import Ititle from '@/components/ui/Ititle';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
-import { Flex, Text } from '@chakra-ui/react';
+import { Box, Field, Flex, Text } from '@chakra-ui/react';
 import React from 'react';
+import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+interface FormValues {
+  Email: string;
+  Password: string;
+}
 
 const Login = () => {
   const navigate = useNavigate();
-  const { testContext } = React.useContext(RestfulApiContext);
+  const { postLogin } = React.useContext(RestfulApiContext);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>();
+
+  const onSubmit = handleSubmit((data) => {
+    console.log(data);
+    postLogin({}, {}, { username: 'admin', password: 'admin' })
+      .then((res: any) =>
+        navigate('/success', { state: { msg: 'Your message here' } })
+      )
+      .catch((error: any) => {
+        console.error('Error during login:', error);
+      });
+  });
 
   return (
     <Flex direction={'column'} h={'100vh'} background={'background.1'}>
       {/* header */}
       <Flex
         w="100%"
-        h={92}
+        // h={'92px'}
+        py={5}
         alignItems={'center'}
         justifyContent={'center'}
         background={'background.1'}
@@ -24,7 +47,6 @@ const Login = () => {
           HISAKO
         </Ititle>
       </Flex>
-
       <Flex
         // alignItems={'center'}
         justifyContent={'center'}
@@ -41,29 +63,62 @@ const Login = () => {
           <Text fontSize="xl" color={'black'} my={35}>
             Login
           </Text>
-          <IInput placeholder="email" size="lg" mb={30} />
-          <IInput placeholder="password" size="lg" mb={15} />
-          <Text
-            onClick={() => navigate('/login/ResetPassword')}
-            fontSize={'2xs'}
-            color={'black'}
-            mb={35}
-            cursor={'pointer'}
-          >
-            FORGOTTEN PASSWORD?
-          </Text>
-          <Ibutton
-            w={'full'}
-            size="xl"
-            bgColor={'secondary.500'}
-            color={'white'}
-            mb={15}
-            onClick={() =>
-              navigate('/success', { state: { msg: 'Your message here' } })
-            }
-          >
-            SIGN IN
-          </Ibutton>
+
+          <Box w="full">
+            <form onSubmit={onSubmit}>
+              <Field.Root invalid={!!errors.Email}>
+                <IInput
+                  placeholder="Email"
+                  size="lg"
+                  mb={30}
+                  // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  //   console.log(e.currentTarget.value)
+                  // }
+                  {...register('Email')}
+                />
+                <Field.ErrorText>{errors.Email?.message}</Field.ErrorText>
+              </Field.Root>
+              <Field.Root invalid={!!errors.Password}>
+                <IInput
+                  placeholder="Password"
+                  size="lg"
+                  mb={15}
+                  {...register('Password')}
+                />
+                <Field.ErrorText>{errors.Password?.message}</Field.ErrorText>
+              </Field.Root>
+
+              <Text
+                onClick={() => navigate('/login/ResetPassword')}
+                fontSize={'2xs'}
+                color={'black'}
+                w={'full'}
+                textAlign={'center'}
+                mb={35}
+                cursor={'pointer'}
+              >
+                FORGOTTEN PASSWORD?
+              </Text>
+              <Ibutton
+                w={'full'}
+                size="xl"
+                bgColor={'secondary.500'}
+                color={'white'}
+                mb={15}
+                type="submit"
+                // onClick={() => {
+                //   postLogin({}, {}, { username: 'admin', password: 'admin' })
+                //     .then((res: any) => console.log(res))
+                //     .catch((error: any) => {
+                //       console.error('Error during login:', error);
+                //     });
+                //   // navigate('/success', { state: { msg: 'Your message here' } })
+                // }}
+              >
+                SIGN IN
+              </Ibutton>
+            </form>
+          </Box>
           <Text
             fontSize={'2xs'}
             color={'white'}
@@ -74,6 +129,16 @@ const Login = () => {
             CREATE NEW ACCOUNT
           </Text>
         </Flex>
+      </Flex>
+      <Flex w="full" h="full" justifyContent="center" alignItems="center">
+        <Text
+          onClick={() => navigate('/login/ResetPassword')}
+          fontSize={'xs'}
+          color={'black'}
+          mb={35}
+        >
+          OR CONTINUE WITH
+        </Text>
       </Flex>
     </Flex>
   );

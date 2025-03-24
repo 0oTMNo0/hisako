@@ -10,6 +10,7 @@ import {
 } from '@/constants/Global';
 
 const postLogin: IServiceCall = (queryParams, pathParams, body) => {
+  console.log('1111', body);
   return axios({
     method: POST,
     url: BASE_URL + `/api/auth/login/`,
