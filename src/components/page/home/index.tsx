@@ -12,6 +12,36 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 
 export default function Home() {
+  const loadMoreRef = React.useRef<HTMLDivElement>(null);
+  const [data, setData] = React.useState(20);
+
+  React.useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log('loading');
+            // Call your API here when ready
+            setData((d) => {
+              console.log(d);
+              return d + 5;
+            });
+          }
+        });
+      },
+      { threshold: 1 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
+    }
+    return () => {
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
+    };
+  }, []);
+
   return (
     <Box bg={'background.1'} maxWidth={'100vw'} minHeight={'100vh'} pt={10}>
       <Box width="100vw">
@@ -61,7 +91,7 @@ export default function Home() {
         </Heading>
 
         <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap={6}>
-          {Array.from({ length: 4 }).map((_, index) => (
+          {Array.from({ length: data }).map((_, index) => (
             <Flex
               direction={'row'}
               key={index}
@@ -81,7 +111,7 @@ export default function Home() {
               />
               <Flex direction={'column'}>
                 <Text fontWeight="medium" mb={1} color={'black'}>
-                  PRODUCT
+                  PRODUCT {index}
                 </Text>
                 <Text fontSize="xs" color="black">
                   Size, colour
@@ -90,6 +120,8 @@ export default function Home() {
             </Flex>
           ))}
         </Grid>
+        {/* Sentinel element to trigger loading when scrolled into view */}
+        <Box ref={loadMoreRef} height="1px" />
       </Box>
     </Box>
   );
