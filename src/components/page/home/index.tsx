@@ -20,11 +20,10 @@ export default function Home() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            console.log('loading');
+            console.log('loading', data);
             // Call your API here when ready
             setData((d) => {
-              console.log(d);
-              return d + 5;
+              return d < 40 ? d + 5 : d;
             });
           }
         });
@@ -69,7 +68,7 @@ export default function Home() {
                 position="absolute"
                 bottom="1rem"
                 left="1rem"
-                color="red"
+                color="white"
                 fontSize="lg"
                 fontWeight="bold"
               >
@@ -90,7 +89,14 @@ export default function Home() {
           DISCOVER
         </Heading>
 
-        <Grid templateColumns={{ base: '1fr', md: 'repeat(4, 1fr)' }} gap={6}>
+        <Grid
+          templateColumns={{
+            base: '1fr',
+            md: 'repeat(2, 1fr)',
+            lg: 'repeat(4, 1fr)',
+          }}
+          gap={6}
+        >
           {Array.from({ length: data }).map((_, index) => (
             <Flex
               direction={'row'}

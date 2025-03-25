@@ -15,6 +15,7 @@ import { IconMenu, IconSearch } from '@/assets/icons';
 import { InputGroup } from './input-group';
 import { useNavigate } from 'react-router-dom';
 import Ititle from './Ititle';
+import Footer from './Footer';
 
 interface NavbarProps {
   children: React.ReactNode;
@@ -138,6 +139,7 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
         </Flex>
       </Flex>
       {children}
+      <Footer />
     </div>
   );
 };
