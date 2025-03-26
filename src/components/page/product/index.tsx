@@ -41,7 +41,7 @@ const Product = () => {
             w={{ base: 'full', md: 500 }}
             h={{ base: 'auto', md: 550 }}
             objectFit="cover"
-            draggable={false}
+            // draggable={false}
           />
         </GridItem>
         <GridItem colSpan={1} p={{ base: 0, md: 30 }}>
