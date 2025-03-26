@@ -5,7 +5,7 @@ import { InputGroup } from './input-group';
 
 const Footer = () => {
   return (
-    <Flex bg={'background.1'} justifyContent={'center'} pt={10}>
+    <Flex bg={'background.1'} px={30} justifyContent={'center'} pt={10}>
       <Grid
         templateColumns={{
           base: '1fr',

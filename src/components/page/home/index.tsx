@@ -1,19 +1,20 @@
 import React from 'react';
-import {
-  Box,
-  Flex,
-  Image,
-  Text,
-  Heading,
-  Grid,
-  Button,
-} from '@chakra-ui/react';
+import { Box, Flex, Image, Text, Heading, Grid } from '@chakra-ui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
+import { useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const [data, setData] = React.useState(20);
+
+  const handleProductClick = () => {
+    const productId = 123;
+    const productName = 'Sample Product';
+    // It's a good idea to encode the product name if it contains spaces or special characters
+    navigate(`/product/${productId}/${encodeURIComponent(productName)}`);
+  };
 
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -107,6 +108,7 @@ export default function Home() {
               h={24}
               gap={5}
               alignItems={'center'}
+              onClick={handleProductClick}
             >
               <Image
                 src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"

@@ -5,6 +5,7 @@ import CreateAccount from './createAccount';
 import ResetPass from './login/resetPass';
 import Success from './success';
 import Navbar from '../ui/Navbar';
+import Product from './product';
 
 function AppRouter() {
   return (
@@ -22,6 +23,14 @@ function AppRouter() {
         <Route path="createAccount" element={<CreateAccount />} />
         <Route path="/login/ResetPassword" element={<ResetPass />} />
         <Route path="/success" element={<Success />} />
+        <Route
+          path="/product/:id/:name"
+          element={
+            <Navbar>
+              <Product />
+            </Navbar>
+          }
+        />
       </Routes>
     </Router>
   );
