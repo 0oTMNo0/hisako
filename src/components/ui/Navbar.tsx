@@ -223,23 +223,16 @@ const Navbar: React.FC<NavbarProps> = ({ children }) => {
                         <Text cursor="pointer" color="black">
                           ABOUT
                         </Text>
-                        <InputGroup flex="1" startElement={<IconSearch />}>
-                          <Input
-                            placeholder="Search contacts"
-                            border="none"
-                            paddingInlineStart={51}
-                            color="black"
-                            pl={50}
-                          />
-                        </InputGroup>
-                        <Button
+                        <Text
+                          cursor="pointer"
+                          color="black"
                           onClick={() => {
                             setOpen(false);
                             navigate('/login');
                           }}
                         >
                           LOGIN
-                        </Button>
+                        </Text>
                       </Flex>
                     </Drawer.Body>
                     <Drawer.Footer>

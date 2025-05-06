@@ -3,17 +3,45 @@ import { Box, Flex, Image, Text, Heading, Grid } from '@chakra-ui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
+import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 
 export default function Home() {
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [data, setData] = React.useState(20);
+  const { getProducts, postTokenRefresh, getProduct } =
+    React.useContext(RestfulApiContext);
 
-  const handleProductClick = () => {
+  const handleProductClick = async () => {
     const productId = 123;
     const productName = 'Sample Product';
     // It's a good idea to encode the product name if it contains spaces or special characters
-    navigate(`/product/${productId}/${encodeURIComponent(productName)}`);
+    // navigate(`/product/${productId}/${encodeURIComponent(productName)}`);
+    // console.log(getProducts({}, {}, {
+
+    // }));
+
+    // const response = await postTokenRefresh(
+    //   {},
+    //   {},
+    //   {
+    //     refresh:
+    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NjYxODQwOCwiaWF0IjoxNzQ2NTMyMDA4LCJqdGkiOiIxYzAxY2Y5NTVkYzU0ZGVmOTQ5ZjY5Y2JlYTkxM2YxOSIsInVzZXJfaWQiOjl9.lqyZbfcvRR6QtlAKQcY56yVgtO7E9ckgI7LCAmZKRwY',
+    //   }
+    // );
+
+    // const response = await getProducts({}, {}, {});
+    // const response = await getProduct({}, {}, {});
+    const response = await getProducts(
+      {
+        page_size: 10,
+        // cursor_query: 'cursor',
+        max_page_size: 10,
+      },
+      {},
+      {}
+    );
+    console.log('Response:', response);
   };
 
   React.useEffect(() => {

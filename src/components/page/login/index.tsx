@@ -21,15 +21,24 @@ const Login = () => {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit = handleSubmit((data) => {
-    console.log(data);
-    postLogin({}, {}, { username: 'admin', password: 'admin' })
-      .then((res: any) =>
-        navigate('/success', { state: { msg: 'Your message here' } })
-      )
-      .catch((error: any) => {
-        console.error('Error during login:', error);
+  const onSubmit = handleSubmit(async (data) => {
+    try {
+      const response = await postLogin(
+        {},
+        {},
+        {
+          email: data.Email,
+          password: data.Password,
+        }
+      );
+      console.log('Login response:', response);
+      navigate('/success', {
+        state: { msg: `Welcome back, ${data.Email}!` },
       });
+    } catch (error: any) {
+      console.error('Error during login:', error);
+      // Optionally, you could show an error message to the user here
+    }
   });
 
   return (
@@ -71,6 +80,7 @@ const Login = () => {
                   placeholder="Email"
                   size="lg"
                   mb={30}
+                  error={!!errors.Email}
                   // onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   //   console.log(e.currentTarget.value)
                   // }
@@ -83,6 +93,7 @@ const Login = () => {
                   placeholder="Password"
                   size="lg"
                   mb={15}
+                  error={!!errors.Password}
                   {...register('Password')}
                 />
                 <Field.ErrorText>{errors.Password?.message}</Field.ErrorText>

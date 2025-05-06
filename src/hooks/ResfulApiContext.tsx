@@ -9,7 +9,30 @@ import {
   IServiceCall,
 } from '@/constants/Global';
 
+const GeminiKey = 'AIzaSyAs3aXFRBfhYveosTQfyB9VWIXuVnFtph8';
+
+/**
+ * Build the prompt for Gemini by injecting the user's request.
+ */
+const buildGeminiPrompt = (userText: string): string => {
+  return `
+You have the following available brands: BrandA, BrandB, BrandC.
+You have the following product types: T-shirt, Pants, Shoes, Jacket.
+
+User request: "${userText}"
+
+Generate and return a JSON object suitable as query parameters for the getProducts API. The JSON should include only the relevant keys (e.g., "brand" and/or "type") with values derived from the user request. For example:
+{
+  "brand": "BrandB",
+  "type": "T-shirt"
+}
+
+Do not include any other keys or explanations; return only the JSON object.
+`;
+};
+
 const postLogin: IServiceCall = (queryParams, pathParams, body) => {
+  //done
   console.log('1111', body);
   return axios({
     method: POST,
@@ -36,6 +59,68 @@ const postRefresh: IServiceCall = (queryParams, pathParams, body) => {
   });
 };
 
+const postRegister: IServiceCall = (queryParams, pathParams, body) => {
+  //done
+  console.log('33333', body);
+  return axios({
+    method: POST,
+    url: BASE_URL + `/api/auth/register/`,
+    headers: { 'Content-Type': 'application/json' },
+    params: queryParams,
+    data: body,
+  });
+};
+
+const postTokenRefresh: IServiceCall = (queryParams, pathParams, body) => {
+  return axios({
+    method: POST,
+    url: BASE_URL + `/api/auth/token/refresh/`,
+    headers: { 'Content-Type': 'application/json' },
+    params: queryParams,
+    data: body,
+  });
+};
+
+const getProducts: IServiceCall = (queryParams, pathParams, body) => {
+  console.log('00000000');
+  return axios({
+    method: GET,
+    // url: BASE_URL + `/products/`,
+    url:
+      BASE_URL +
+      `/api/products/?cursor=cD0yMDI1LTA1LTAyKzEyJTNBNTklM0EyMy4xNDI2MzUlMkIwMCUzQTAw`,
+    headers: {
+      Authorization:
+        `Bearer ` +
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2NTM0NTU3LCJpYXQiOjE3NDY1MzIwMDgsImp0aSI6IjA1NWE3ZDQyMTFkYzRiOWM4NmZhYjM2YTdjMjRmNDEwIiwidXNlcl9pZCI6OX0.oIroPnvwI-_zBKmkxKClfaqdgFmMTa4zlAjUnlw6zdA',
+    },
+    params: queryParams,
+  });
+};
+
+// const getProduct: IServiceCall = (queryParams, pathParams, body) => {
+//   return axios({
+//     method: GET,
+//     // url: BASE_URL + `/products/${pathParams.id}/`,
+//     url: BASE_URL + `/products/3/`,
+//     headers: {
+//       Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2NTM0MDIxLCJpYXQiOjE3NDY1MzIwMDgsImp0aSI6IjAxNjk2YzQyZGM5YTRhN2JiY2U3ZjE0ODM5YjVmOThjIiwidXNlcl9pZCI6OX0.KNyD_rohAlXVP2f_hJu8jAA6gzQWCNbefT1tqhW0pOo"`,
+//     },
+//     params: queryParams,
+//   });
+// };
+
+// Call Google Gemini generative model to generate structured JSON
+const postGeminiContent: IServiceCall = (queryParams, pathParams, body) => {
+  return axios({
+    method: POST,
+    url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GeminiKey}`,
+    headers: { 'Content-Type': 'application/json' },
+    params: queryParams,
+    data: body,
+  });
+};
+
 const testContext = () => {
   console.log('hiiiiiii');
 };
@@ -44,7 +129,19 @@ export const RestfulApiContext = React.createContext<any | null>(null);
 
 export const RestfulApiProvider = (props: any) => {
   return (
-    <RestfulApiContext.Provider value={{ postLogin, postRefresh, testContext }}>
+    <RestfulApiContext.Provider
+      value={{
+        postRegister,
+        postLogin,
+        postRefresh,
+        postTokenRefresh,
+        getProducts,
+        // getProduct,
+        postGeminiContent,
+        testContext,
+        buildGeminiPrompt,
+      }}
+    >
       {props.children}
     </RestfulApiContext.Provider>
   );
