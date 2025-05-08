@@ -1,6 +1,8 @@
 import { IconLove, IconMenu } from '@/assets/icons';
 import Ibutton from '@/components/ui/Ibutton';
 import Ititle from '@/components/ui/Ititle';
+import { IProduct } from '@/constants/Global';
+import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import {
   Box,
   Flex,
@@ -9,23 +11,80 @@ import {
   Heading,
   IconButton,
   Image,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
+import React from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Toaster, toaster } from '@/components/ui/toaster';
 
 const Product = () => {
   const { id, name } = useParams();
   const navigate = useNavigate();
-
   const { state } = useLocation();
-  const product = state.product;
-  console.log(product);
-  const handleProductClick = () => {
-    const productId = 123;
-    const productName = 'Sample Product';
-    // It's a good idea to encode the product name if it contains spaces or special characters
-    navigate(`/product/${productId}/${encodeURIComponent(productName)}`);
+  const product: IProduct | undefined = state.product;
+  const [apiCall, setApiCall] = React.useState(0);
+  const [simData, setSimData] = React.useState<IProduct[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { getProducts, handleTokenExist } = React.useContext(RestfulApiContext);
+
+  const handleProductClick = async (product: IProduct) => {
+    navigate(`/product/${product.id}/${product.prod_title}`, {
+      state: { product },
+    });
   };
+
+  /**
+   * Open Google Lens in a new tab to search by the product's image URL.
+   */
+  const searchWithGoogleLens = (): void => {
+    if (!product?.image) {
+      console.error('No image URL available for Google Lens search.');
+      return;
+    } else {
+      const lensUrl = `https://lens.google.com/uploadbyurl?url=${encodeURIComponent(
+        product?.image
+      )}`;
+      window.open(lensUrl, '_blank');
+    }
+  };
+
+  const callData = () => {
+    setIsLoading(true);
+    getProducts({ page: 1, subcategory: product?.subcategory }, {}, {})
+      .then((res: any) => {
+        console.log('Response:', res);
+        setSimData([...res.data.results].slice(0, 8));
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  React.useEffect(() => {
+    if (apiCall == 0) {
+      console.log('apiCall:', apiCall);
+      handleTokenExist()
+        .then((res: any) => {
+          if (res) {
+            setApiCall(1);
+            console.log('token exist');
+          } else {
+            navigate('/login');
+          }
+        })
+        .catch((err: any) => {
+          console.log('Error:', err);
+          navigate('/login');
+        });
+    }
+  }, [apiCall]);
+
+  React.useEffect(() => {
+    if (apiCall > 0) {
+      callData();
+    }
+  }, [apiCall]);
 
   return (
     <Flex direction={'column'} bg={'background.1'}>
@@ -37,7 +96,7 @@ const Product = () => {
       >
         <GridItem colSpan={1} p={{ base: 0, md: 30 }}>
           <Image
-            src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
+            src={product?.image}
             alt={`Product ${1}`}
             width="full"
             height="full"
@@ -48,8 +107,6 @@ const Product = () => {
           />
         </GridItem>
         <GridItem colSpan={1} p={{ base: 0, md: 30 }}>
-          {/* <h1>Product: {name}</h1>
-        <p>ID: {id}</p> */}
           <Flex
             w={'full'}
             h={'full'}
@@ -61,19 +118,35 @@ const Product = () => {
               {name}
             </Ititle>
             <Text mb={6} color={'black'}>
-              Description Named after asteroid 6 0 9 4 (h i s a k o) is
-              currently travelling through time and space. STOCK SIZE, COLOUR
-              BRAND XXX is a designer brand that makes their garments in space.
+              The {product?.prod_title} is a standout piece in our
+              {product?.subcategory}
+              collection, thoughtfully designed for {product?.usage}. Crafted
+              with attention to detail and lasting comfort in mind, it combines
+              style and function so you can look—and feel—your best wherever
+              your day takes you. You can expect to pay around {product?.price},
+              making it an exceptional value for the quality and versatility it
+              delivers.
             </Text>
             <Flex gap={{ base: 10, sm: 5 }}>
-              <Ibutton bg={'primary.500'} flex={1}>
+              <Ibutton
+                bg={'primary.500'}
+                flex={1}
+                onClick={searchWithGoogleLens}
+              >
                 BUY NOW
               </Ibutton>
               <IconButton
-                // aria-label="Search database"
                 variant="outline"
                 size={'md'}
                 rounded={0}
+                onClick={() => {
+                  toaster.create({
+                    title: 'Coming Soon',
+                    description: ' This feature is not available yet',
+                    type: 'warning',
+                    duration: 2000,
+                  });
+                }}
               >
                 <IconLove />
               </IconButton>
@@ -99,20 +172,20 @@ const Product = () => {
           }}
           gap={6}
         >
-          {Array.from({ length: 8 }).map((_, index) => (
+          {simData.map((item: IProduct) => (
             <Flex
               direction={'row'}
-              key={index}
+              key={item.id}
               p={'8px'}
               overflow="hidden"
               bg={'primary.500'}
               h={24}
               gap={5}
               alignItems={'center'}
-              onClick={handleProductClick}
+              onClick={() => handleProductClick(item)}
             >
               <Image
-                src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
+                src={item.image}
                 alt="Product"
                 height="full"
                 objectFit="cover"
@@ -120,16 +193,27 @@ const Product = () => {
               />
               <Flex direction={'column'}>
                 <Text fontWeight="medium" mb={1} color={'black'}>
-                  PRODUCT {index}
+                  {item.prod_title}
                 </Text>
                 <Text fontSize="xs" color="black">
-                  Size, colour
+                  {item.colour}
                 </Text>
               </Flex>
             </Flex>
           ))}
+          {isLoading && (
+            <Flex
+              justifyContent={'center'}
+              alignItems={'center'}
+              h={24}
+              // bg={'primary.500'}
+            >
+              <Spinner color={'black'} />
+            </Flex>
+          )}
         </Grid>
       </Box>
+      <Toaster />
     </Flex>
   );
 };
