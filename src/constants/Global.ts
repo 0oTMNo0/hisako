@@ -25,3 +25,13 @@ export type IApiState = {
   data: any;
   error: string | undefined;
 };
+
+export interface IProduct {
+  colour: string;
+  id: number;
+  image: string;
+  price: string;
+  prod_title: string;
+  subcategory: string;
+  usage: string;
+}

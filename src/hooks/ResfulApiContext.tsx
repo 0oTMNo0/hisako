@@ -11,6 +11,44 @@ import {
 
 const GeminiKey = 'AIzaSyAs3aXFRBfhYveosTQfyB9VWIXuVnFtph8';
 
+const getAssessTokenFromLocalStorage = () => {
+  return localStorage.getItem('accessToken');
+};
+
+const getRefreshTokenFromLocalStorage = () => {
+  return localStorage.getItem('refreshToken');
+};
+
+const setAssessTokenToLocalStorage = (token: string) => {
+  localStorage.setItem('accessToken', token);
+};
+
+const setRefreshTokenToLocalStorage = (token: string) => {
+  localStorage.setItem('refreshToken', token);
+};
+
+const handleTokenExist = async (): Promise<boolean> => {
+  try {
+    // console.log('Checking token existence...');
+    const token = localStorage.getItem('refreshToken');
+    if (token) {
+      // console.log('No refresh token found');
+      console.log('Refreshing token...');
+      const response: any = await postTokenRefresh({}, {}, { refresh: token });
+      console.log('Response:', response);
+      const { access } = response.data;
+      setAssessTokenToLocalStorage(access);
+      // console.log('Token refreshed successfully');
+      return true;
+    } else {
+      return false;
+    }
+  } catch (error: any) {
+    // console.error('Error during token refresh:', error);
+    return false;
+  }
+};
+
 /**
  * Build the prompt for Gemini by injecting the user's request.
  */
@@ -82,17 +120,13 @@ const postTokenRefresh: IServiceCall = (queryParams, pathParams, body) => {
 };
 
 const getProducts: IServiceCall = (queryParams, pathParams, body) => {
-  console.log('00000000');
+  console.log('1111111', getAssessTokenFromLocalStorage());
+  console.log('2222222', pathParams, pathParams, body);
   return axios({
     method: GET,
-    // url: BASE_URL + `/products/`,
-    url:
-      BASE_URL +
-      `/api/products/?cursor=cD0yMDI1LTA1LTAyKzEyJTNBNTklM0EyMy4xNDI2MzUlMkIwMCUzQTAw`,
+    url: BASE_URL + `/api/products/`,
     headers: {
-      Authorization:
-        `Bearer ` +
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzQ2NTM0NTU3LCJpYXQiOjE3NDY1MzIwMDgsImp0aSI6IjA1NWE3ZDQyMTFkYzRiOWM4NmZhYjM2YTdjMjRmNDEwIiwidXNlcl9pZCI6OX0.oIroPnvwI-_zBKmkxKClfaqdgFmMTa4zlAjUnlw6zdA',
+      Authorization: `Bearer ` + getAssessTokenFromLocalStorage(),
     },
     params: queryParams,
   });
@@ -140,6 +174,11 @@ export const RestfulApiProvider = (props: any) => {
         postGeminiContent,
         testContext,
         buildGeminiPrompt,
+        getAssessTokenFromLocalStorage,
+        getRefreshTokenFromLocalStorage,
+        setAssessTokenToLocalStorage,
+        setRefreshTokenToLocalStorage,
+        handleTokenExist,
       }}
     >
       {props.children}

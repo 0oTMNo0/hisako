@@ -1,74 +1,95 @@
 import React from 'react';
-import { Box, Flex, Image, Text, Heading, Grid } from '@chakra-ui/react';
+import {
+  Box,
+  Flex,
+  Image,
+  Text,
+  Heading,
+  Grid,
+  Spinner,
+} from '@chakra-ui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
+import { IProduct } from '@/constants/Global';
 
 export default function Home() {
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-  const [data, setData] = React.useState(20);
-  const { getProducts, postTokenRefresh, getProduct } =
-    React.useContext(RestfulApiContext);
+  const [data, setData] = React.useState<IProduct[]>([]);
+  const [pageNumber, setPageNumber] = React.useState<number>(1);
+  const [apiCall, setApiCall] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [noMoreData, setNoMoreData] = React.useState(false);
 
-  const handleProductClick = async () => {
-    const productId = 123;
-    const productName = 'Sample Product';
-    // It's a good idea to encode the product name if it contains spaces or special characters
-    // navigate(`/product/${productId}/${encodeURIComponent(productName)}`);
-    // console.log(getProducts({}, {}, {
+  const { getProducts, handleTokenExist } = React.useContext(RestfulApiContext);
 
-    // }));
+  const handleProductClick = async (product: IProduct) => {
+    navigate(`/product/${product.id}/${product.prod_title}`, {
+      state: { product },
+    });
+  };
 
-    // const response = await postTokenRefresh(
-    //   {},
-    //   {},
-    //   {
-    //     refresh:
-    //       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc0NjYxODQwOCwiaWF0IjoxNzQ2NTMyMDA4LCJqdGkiOiIxYzAxY2Y5NTVkYzU0ZGVmOTQ5ZjY5Y2JlYTkxM2YxOSIsInVzZXJfaWQiOjl9.lqyZbfcvRR6QtlAKQcY56yVgtO7E9ckgI7LCAmZKRwY',
-    //   }
-    // );
+  const pageRef = React.useRef(pageNumber);
+  React.useEffect(() => {
+    pageRef.current = pageNumber;
+  }, [pageNumber]);
 
-    // const response = await getProducts({}, {}, {});
-    // const response = await getProduct({}, {}, {});
-    const response = await getProducts(
-      {
-        page_size: 10,
-        // cursor_query: 'cursor',
-        max_page_size: 10,
-      },
-      {},
-      {}
-    );
-    console.log('Response:', response);
+  const callData = () => {
+    const nextPage = pageRef.current;
+    setIsLoading(true);
+    console.log('Fetching page', nextPage);
+    getProducts({ page: nextPage }, {}, {})
+      .then((res: any) => {
+        console.log('Response:', res);
+        setData((d) => [...d, ...res.data.results]);
+        setPageNumber((p) => p + 1);
+        if (res.data.count <= nextPage * 10) {
+          setNoMoreData(true);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   React.useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            console.log('loading', data);
-            // Call your API here when ready
-            setData((d) => {
-              return d < 40 ? d + 5 : d;
-            });
+    if (apiCall == 0) {
+      console.log('apiCall:', apiCall);
+      handleTokenExist()
+        .then((res: any) => {
+          if (res) {
+            setApiCall(1);
+            console.log('token exist');
+          } else {
+            navigate('/login');
           }
+        })
+        .catch((err: any) => {
+          console.log('Error:', err);
+          navigate('/login');
         });
-      },
-      { threshold: 1 }
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
     }
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, []);
+  }, [apiCall]);
+
+  React.useEffect(() => {
+    if (apiCall > 0 && !isLoading && !noMoreData) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !isLoading && !noMoreData) {
+              callData();
+            }
+          });
+        },
+        { threshold: 0 }
+      );
+
+      observer.observe(loadMoreRef.current!);
+      return () => observer.disconnect();
+    }
+  }, [apiCall]);
 
   return (
     <Box bg={'background.1'} maxWidth={'100vw'} minHeight={'100vh'} pt={10}>
@@ -126,7 +147,7 @@ export default function Home() {
           }}
           gap={6}
         >
-          {Array.from({ length: data }).map((_, index) => (
+          {data.map((item: IProduct, index: number) => (
             <Flex
               direction={'row'}
               key={index}
@@ -136,10 +157,10 @@ export default function Home() {
               h={24}
               gap={5}
               alignItems={'center'}
-              onClick={handleProductClick}
+              onClick={() => handleProductClick(item)}
             >
               <Image
-                src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
+                src={item.image}
                 alt="Product"
                 height="full"
                 objectFit="cover"
@@ -147,15 +168,30 @@ export default function Home() {
               />
               <Flex direction={'column'}>
                 <Text fontWeight="medium" mb={1} color={'black'}>
-                  PRODUCT {index}
+                  {item.prod_title}
                 </Text>
                 <Text fontSize="xs" color="black">
-                  Size, colour
+                  {item.colour}
                 </Text>
               </Flex>
             </Flex>
           ))}
         </Grid>
+        {isLoading && (
+          <Flex
+            justifyContent="center"
+            alignItems="center"
+            height="50px"
+            width="100%"
+          >
+            <Spinner color={'black'} />
+          </Flex>
+        )}
+        {noMoreData && (
+          <Text fontSize="sm" color="gray.500" textAlign="center" mt={4} mb={8}>
+            No more products to load.
+          </Text>
+        )}
         {/* Sentinel element to trigger loading when scrolled into view */}
         <Box ref={loadMoreRef} height="1px" />
       </Box>

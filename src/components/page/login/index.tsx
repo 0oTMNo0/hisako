@@ -13,7 +13,11 @@ interface FormValues {
 
 const Login = () => {
   const navigate = useNavigate();
-  const { postLogin } = React.useContext(RestfulApiContext);
+  const {
+    postLogin,
+    setAssessTokenToLocalStorage,
+    setRefreshTokenToLocalStorage,
+  } = React.useContext(RestfulApiContext);
 
   const {
     register,
@@ -32,6 +36,9 @@ const Login = () => {
         }
       );
       console.log('Login response:', response);
+      const { access, refresh } = response.data;
+      setAssessTokenToLocalStorage(access);
+      setRefreshTokenToLocalStorage(refresh);
       navigate('/success', {
         state: { msg: `Welcome back, ${data.Email}!` },
       });

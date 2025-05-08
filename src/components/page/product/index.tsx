@@ -11,12 +11,15 @@ import {
   Image,
   Text,
 } from '@chakra-ui/react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 const Product = () => {
   const { id, name } = useParams();
   const navigate = useNavigate();
 
+  const { state } = useLocation();
+  const product = state.product;
+  console.log(product);
   const handleProductClick = () => {
     const productId = 123;
     const productName = 'Sample Product';
