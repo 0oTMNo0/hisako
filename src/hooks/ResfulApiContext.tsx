@@ -1,10 +1,10 @@
 import React from 'react';
 import axios from 'axios';
 import {
-  DELETE,
+  // DELETE,
   GET,
   POST,
-  PUT,
+  // PUT,
   BASE_URL,
   IServiceCall,
 } from '@/constants/Global';
@@ -35,7 +35,7 @@ const handleTokenExist = async (): Promise<boolean> => {
       // console.log('No refresh token found');
       console.log('Refreshing token...');
       const response: any = await postTokenRefresh({}, {}, { refresh: token });
-      console.log('Response:', response);
+      // console.log('Response:', response);
       const { access } = response.data;
       setAssessTokenToLocalStorage(access);
       // console.log('Token refreshed successfully');
@@ -53,27 +53,29 @@ const handleTokenExist = async (): Promise<boolean> => {
  * Build the prompt for Gemini by injecting the user's request.
  */
 const buildGeminiPrompt = (userText: string): string => {
-  return `
-you are a helpful assistant in a clothing website which you gonna help other API to find best products for user.
-You have the following available colour: BrandA, BrandB, BrandC.
-You have the following product subcategory: T-shirt, Pants, Shoes, Jacket.
-you have the following product usage: Casual, Formal, Sports.
-you have the following sort: "price", "-price", "created", "-created"
-you have price_min (decimal) and price_max (decimal) for each product. 
-User request: "${userText}"
+  return `You are a service that _only_ builds filter JSON for a clothing API.
+  Available filter fields (use exactly these keys and types):
+    • "colour" (string: ['White', 'Black', 'Blue', 'Pink', 'Red', 'Olive', 'Yellow', 'Navy Blue', 'Magenta', 'Grey', 'Green', 'Orange', 'Purple', 'Turquoise Blue', 'Peach', 'Off White', 'Teal', 'Sea Green', 'Lime Green', 'Brown', 'Lavender', 'Beige', 'Khaki', 'Multi', 'Maroon', 'Cream', 'Rust', 'Grey Melange', 'Silver', 'Tan', 'Charcoal', 'Mushroom Brown', 'Copper', 'Gold', 'Bronze', 'Taupe', 'Metallic', 'Mustard', 'Nude'])
+    • "subcategory" (string: 'Topwear', 'Bottomwear', 'Dress', 'Innerwear', 'Socks', 'Apparel Set', 'Shoes', 'Flip Flops', 'Sandal')
+    • "usage" (string: 'Casual', 'Party', 'Formal', 'Sports
+    • "sort" (string: "price", "-price", "created", or "-created")
+    • "price_min" (number)
+    • "price_max" (number)
+    • "in_stock" (boolean)
 
-Generate and return a JSON object suitable as query parameters for the getProducts API. The JSON should include only the relevant keys (e.g., "brand" and/or "type") with values derived from the user request. For example:
-{
-  "colour": "BrandA",
-  "subcategory": "T-shirt",
-  "usage": "Casual",
-  "sort": "price",
-  "price_min": 10.0,
-  "price_max": 100.0
-}
+  User request: "${userText}"
 
-Do not include any other keys or explanations; return only the JSON object.
-`;
+  **INSTRUCTIONS**
+  • Your response must be _only_ a single JSON object (no markdown, no code fences, no explanation, no trailing commas).
+  • Omit any key that does not apply.
+  • Keys and values must match exactly the names and types above.
+
+  **OUTPUT FORMAT EXAMPLE**
+  {"colour":"White","subcategory":"Topwear","sort":"price","price_min":10.00,"price_max":100.00,"in_stock":true,"usage":"Casual"}
+
+  Now produce the JSON for the request above.
+  `.trim();
+  //  return `Please analyze the following user text and return a JSON object based on these criteria:
 };
 
 const postLogin: IServiceCall = (queryParams, pathParams, body) => {
@@ -106,7 +108,7 @@ const postRefresh: IServiceCall = (queryParams, pathParams, body) => {
 
 const postRegister: IServiceCall = (queryParams, pathParams, body) => {
   //done
-  console.log('33333', body);
+  // console.log('33333', body);
   return axios({
     method: POST,
     url: BASE_URL + `/api/auth/register/`,
@@ -127,8 +129,6 @@ const postTokenRefresh: IServiceCall = (queryParams, pathParams, body) => {
 };
 
 const getProducts: IServiceCall = (queryParams, pathParams, body) => {
-  console.log('1111111', getAssessTokenFromLocalStorage());
-  console.log('2222222', pathParams, pathParams, body);
   return axios({
     method: GET,
     url: BASE_URL + `/api/products/`,
@@ -136,6 +136,7 @@ const getProducts: IServiceCall = (queryParams, pathParams, body) => {
       Authorization: `Bearer ` + getAssessTokenFromLocalStorage(),
     },
     params: queryParams,
+    // data: body,
   });
 };
 

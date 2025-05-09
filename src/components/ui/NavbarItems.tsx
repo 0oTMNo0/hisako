@@ -11,6 +11,7 @@ import {
   Portal,
   Image,
   Grid,
+  Spinner,
 } from '@chakra-ui/react';
 import { IconMenu, IconSearch } from '@/assets/icons';
 import { InputGroup } from './input-group';
@@ -20,15 +21,23 @@ import './animation.css';
 import { Toaster, toaster } from '@/components/ui/toaster';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { GoogleGenAI } from '@google/genai';
+import { IProduct } from '@/constants/Global';
+
+// const GeminiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 const NavbarItems = () => {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
   const [searchActive, setSearchActive] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState('');
-  const { getAssessTokenFromLocalStorage, buildGeminiPrompt } =
+  const [findData, setFindData] = React.useState<IProduct[]>([]);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const { getAssessTokenFromLocalStorage, buildGeminiPrompt, getProducts } =
     React.useContext(RestfulApiContext);
-  const AI = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+  //   const AI = new GoogleGenAI({ apiKey: GeminiKey });
+  const AI = new GoogleGenAI({
+    apiKey: 'AIzaSyAs3aXFRBfhYveosTQfyB9VWIXuVnFtph8',
+  });
 
   const handleAboutClick = () => {
     toaster.create({
@@ -54,18 +63,69 @@ const NavbarItems = () => {
     navigate('/login');
   };
 
+  const handleProductClick = async (product: IProduct) => {
+    setSearchActive(false);
+    setSearchValue('');
+    setFindData([]);
+    setIsLoading(false);
+    navigate(`/product/${product.id}/${product.prod_title}`, {
+      state: { product },
+    });
+  };
+
   const callAI = async (prompt: string) => {
     await AI.models
       .generateContent({
         model: 'gemini-2.0-flash',
         contents: prompt,
       })
-      .then((res) => {
-        console.log('Response:', res);
-        return res;
+      .then((res: any) => {
+        const rawText = res?.candidates[0]?.content?.parts[0]?.text;
+        // console.log('Response:', rawText);
+        const jsonText = rawText.replace(/```json|```/g, '').trim();
+        const json = JSON.parse(jsonText);
+        console.log('AI JSON res:', json);
+
+        // Handle the parsed JSON as needed
+        getProducts(
+          {
+            page: 1,
+            ...json,
+          },
+          {},
+          {}
+        )
+          .then((res: any) => {
+            console.log('get products query:', {
+              page: 1,
+              ...json,
+            });
+            console.log('Response:', res);
+            setFindData(res.data.results);
+          })
+          .catch((err: any) => {
+            console.log('Error:', err);
+            toaster.create({
+              title: `AI Error:`,
+              description: 'Failed to fetch AI response',
+              type: 'error',
+              duration: 2000,
+            });
+            return err;
+          })
+          .finally(() => {
+            setIsLoading(false);
+          });
+        return json;
       })
       .catch((error) => {
         console.error('Error:', error);
+        toaster.create({
+          title: `AI Error:`,
+          description: 'Failed to fetch AI response',
+          type: 'error',
+          duration: 2000,
+        });
         return error;
       });
   };
@@ -74,21 +134,23 @@ const NavbarItems = () => {
     let timer: NodeJS.Timeout;
     if (searchActive && searchValue) {
       timer = setTimeout(() => {
+        setIsLoading(true);
         // Perform search action here
-        const prompt = buildGeminiPrompt(searchValue);
-        console.log('Gemini Prompt:', prompt);
-        callAI(prompt)
-          .then((res) => {
-            console.log('AI Response:', res);
-            // Handle the AI response here
-          })
-          .catch((error) => {
-            console.error('Error calling AI:', error);
-          });
+        // const sample = `Hi I want a red dress for my date and my date partner love old stuff`;
+        const userPrompt = buildGeminiPrompt(searchValue);
+        // const userPrompt = buildGeminiPrompt(sample);
+
+        const sampleResponse = callAI(userPrompt).then((res) => {
+          //   console.log('AI Response:', res);
+          return res;
+        });
+        console.log('Sample Response:', sampleResponse);
       }, 500); // Adjust the delay as needed
     } else if (!searchActive) {
       // Reset search value when search is not active
       setSearchValue('');
+      setFindData([]);
+      setIsLoading(false);
     }
     return () => {
       clearTimeout(timer);
@@ -118,9 +180,14 @@ const NavbarItems = () => {
             <Text cursor="pointer" color="black" onClick={handleAboutClick}>
               ABOUT
             </Text>
-            <InputGroup flex="1" startElement={<IconSearch />}>
+            <InputGroup
+              flex="1"
+              startElement={
+                !isLoading ? <IconSearch /> : <Spinner color={'black'} />
+              }
+            >
               <Input
-                placeholder="Search contacts"
+                placeholder="Ask AI to find your product"
                 border="none"
                 paddingInlineStart={51}
                 color="black"
@@ -160,9 +227,15 @@ const NavbarItems = () => {
             }}
             w="full"
           >
-            <InputGroup flex="1" startElement={<IconSearch />} border={'none'}>
+            <InputGroup
+              flex="1"
+              startElement={
+                !isLoading ? <IconSearch /> : <Spinner color={'black'} />
+              }
+              border={'none'}
+            >
               <Input
-                placeholder="WHAT ARE YOU LOOKING FOR?"
+                placeholder="Ask AI to find your product"
                 border="none"
                 borderWidth={'unset'}
                 paddingInlineStart={51}
@@ -286,34 +359,38 @@ const NavbarItems = () => {
               animationName: 'fadeOut',
               animationDuration: '1120ms',
             }}
+            bgColor={'white'}
           >
-            <Flex
-              direction={'row'}
-              // key={index}
-              p={'8px'}
-              overflow="hidden"
-              bg={'background.1'}
-              h={24}
-              gap={5}
-              alignItems={'center'}
-              // onClick={handleProductClick}
-            >
-              <Image
-                src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
-                alt="Product"
-                height="full"
-                objectFit="cover"
-                aspectRatio={1 / 1}
-              />
-              <Flex direction={'column'}>
-                <Text fontWeight="medium" mb={1} color={'black'}>
-                  PRODUCT
-                </Text>
-                <Text fontSize="xs" color="black">
-                  Size, colour
-                </Text>
+            {findData.map((item: IProduct, index: number) => (
+              <Flex
+                direction={'row'}
+                // key={index}
+                p={'8px'}
+                overflow="hidden"
+                bg={'background.1'}
+                h={24}
+                gap={5}
+                alignItems={'center'}
+                onClick={() => handleProductClick(item)}
+                key={item.id}
+              >
+                <Image
+                  src={item.image}
+                  alt="Product"
+                  height="full"
+                  objectFit="cover"
+                  aspectRatio={1 / 1}
+                />
+                <Flex direction={'column'}>
+                  <Text fontWeight="medium" mb={1} color={'black'}>
+                    {item.prod_title}
+                  </Text>
+                  <Text fontSize="xs" color="black">
+                    {item.colour}
+                  </Text>
+                </Flex>
               </Flex>
-            </Flex>
+            ))}
           </Grid>
           {/* Backdrop */}
           <Flex

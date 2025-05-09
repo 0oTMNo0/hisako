@@ -63,7 +63,7 @@ const Product = () => {
 
   React.useEffect(() => {
     if (apiCall == 0) {
-      console.log('apiCall:', apiCall);
+      // console.log('apiCall:', apiCall);
       handleTokenExist()
         .then((res: any) => {
           if (res) {

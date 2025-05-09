@@ -13,11 +13,14 @@ import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { IProduct } from '@/constants/Global';
+import { set } from 'react-hook-form';
+import { it } from 'node:test';
 
 export default function Home() {
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const [data, setData] = React.useState<IProduct[]>([]);
+  const [swaperData, setSwiperData] = React.useState<IProduct[]>([]);
   const [pageNumber, setPageNumber] = React.useState<number>(1);
   const [apiCall, setApiCall] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -39,10 +42,16 @@ export default function Home() {
   const callData = () => {
     const nextPage = pageRef.current;
     setIsLoading(true);
-    console.log('Fetching page', nextPage);
-    getProducts({ page: nextPage }, {}, {})
+    // console.log('Fetching page', nextPage);
+    getProducts(
+      {
+        page: nextPage,
+      },
+      {},
+      {}
+    )
       .then((res: any) => {
-        console.log('Response:', res);
+        // console.log('Response:', res);
         setData((d) => [...d, ...res.data.results]);
         setPageNumber((p) => p + 1);
         if (res.data.count <= nextPage * 10) {
@@ -54,9 +63,30 @@ export default function Home() {
       });
   };
 
+  const callDataForSwaper = () => {
+    getProducts(
+      {
+        page: 1,
+        colour: 'red',
+        sort: 'created',
+        subcategory: 'Dress',
+        usage: 'Party',
+      },
+      {}
+    ).then((res: any) => {
+      setSwiperData(res.data.results);
+    });
+  };
+
+  React.useEffect(() => {
+    if (apiCall == 1) {
+      callDataForSwaper();
+    }
+  }, [apiCall]);
+
   React.useEffect(() => {
     if (apiCall == 0) {
-      console.log('apiCall:', apiCall);
+      // console.log('apiCall:', apiCall);
       handleTokenExist()
         .then((res: any) => {
           if (res) {
@@ -100,13 +130,14 @@ export default function Home() {
           freeMode={true}
           style={{ paddingLeft: 30, paddingRight: 30 }}
         >
-          {[1, 2, 3, 4, 5, 6, 7].map((item: any) => (
+          {swaperData.map((item: IProduct, index: number) => (
             <SwiperSlide
-              key={item}
+              key={item.id}
+              onClick={() => handleProductClick(item)}
               style={{ width: '280px', height: '320px', position: 'relative' }}
             >
               <Image
-                src="https://gratisography.com/wp-content/uploads/2024/11/gratisography-augmented-reality-800x525.jpg"
+                src={item.image}
                 alt={`Product ${item}`}
                 width="full"
                 height="full"
@@ -118,11 +149,13 @@ export default function Home() {
                 position="absolute"
                 bottom="1rem"
                 left="1rem"
-                color="white"
+                color="black"
                 fontSize="lg"
                 fontWeight="bold"
               >
-                2PRODUCT {item}
+                {/* just show two first words */}
+                {item.prod_title.split(' ').slice(0, 2).join(' ')}
+                {/* {item.prod_title} */}
               </Text>
             </SwiperSlide>
           ))}
