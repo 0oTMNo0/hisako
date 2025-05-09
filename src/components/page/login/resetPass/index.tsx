@@ -1,15 +1,10 @@
 import Ibutton from '@/components/ui/Ibutton';
 import IInput from '@/components/ui/Iinput';
 import Ititle from '@/components/ui/Ititle';
-import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { Flex, Text } from '@chakra-ui/react';
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Toaster, toaster } from '@/components/ui/toaster';
 
 const ResetPass = () => {
-  const navigate = useNavigate();
-  const { testContext } = React.useContext(RestfulApiContext);
-
   return (
     <Flex direction={'column'} h={'100vh'} background={'background.1'}>
       {/* header */}
@@ -51,12 +46,20 @@ const ResetPass = () => {
             bgColor={'secondary.500'}
             color={'white'}
             mb={15}
-            onClick={() => testContext()}
+            onClick={() => {
+              toaster.create({
+                title: 'Coming Soon',
+                description: ' This feature is not available yet',
+                type: 'warning',
+                duration: 2000,
+              });
+            }}
           >
             CONTINUE
           </Ibutton>
         </Flex>
       </Flex>
+      <Toaster />
     </Flex>
   );
 };
