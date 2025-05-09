@@ -9,7 +9,7 @@ import {
   IServiceCall,
 } from '@/constants/Global';
 
-const GeminiKey = 'AIzaSyAs3aXFRBfhYveosTQfyB9VWIXuVnFtph8';
+// const GeminiKey = 'AIzaSyAs3aXFRBfhYveosTQfyB9VWIXuVnFtph8';
 
 const getAssessTokenFromLocalStorage = () => {
   return localStorage.getItem('accessToken');
@@ -54,15 +54,22 @@ const handleTokenExist = async (): Promise<boolean> => {
  */
 const buildGeminiPrompt = (userText: string): string => {
   return `
-You have the following available brands: BrandA, BrandB, BrandC.
-You have the following product types: T-shirt, Pants, Shoes, Jacket.
-
+you are a helpful assistant in a clothing website which you gonna help other API to find best products for user.
+You have the following available colour: BrandA, BrandB, BrandC.
+You have the following product subcategory: T-shirt, Pants, Shoes, Jacket.
+you have the following product usage: Casual, Formal, Sports.
+you have the following sort: "price", "-price", "created", "-created"
+you have price_min (decimal) and price_max (decimal) for each product. 
 User request: "${userText}"
 
 Generate and return a JSON object suitable as query parameters for the getProducts API. The JSON should include only the relevant keys (e.g., "brand" and/or "type") with values derived from the user request. For example:
 {
-  "brand": "BrandB",
-  "type": "T-shirt"
+  "colour": "BrandA",
+  "subcategory": "T-shirt",
+  "usage": "Casual",
+  "sort": "price",
+  "price_min": 10.0,
+  "price_max": 100.0
 }
 
 Do not include any other keys or explanations; return only the JSON object.
@@ -155,10 +162,6 @@ const postGeminiContent: IServiceCall = (queryParams, pathParams, body) => {
   });
 };
 
-const testContext = () => {
-  console.log('hiiiiiii');
-};
-
 export const RestfulApiContext = React.createContext<any | null>(null);
 
 export const RestfulApiProvider = (props: any) => {
@@ -172,7 +175,6 @@ export const RestfulApiProvider = (props: any) => {
         getProducts,
         // getProduct,
         postGeminiContent,
-        testContext,
         buildGeminiPrompt,
         getAssessTokenFromLocalStorage,
         getRefreshTokenFromLocalStorage,

@@ -4,7 +4,7 @@ import Login from './login';
 import CreateAccount from './createAccount';
 import ResetPass from './login/resetPass';
 import Success from './success';
-import Navbar from '../ui/Navbar';
+import ThemeWrapper from '../ui/Navbar';
 import Product from './product';
 
 function AppRouter() {
@@ -14,9 +14,9 @@ function AppRouter() {
         <Route
           path="/"
           element={
-            <Navbar>
+            <ThemeWrapper>
               <Home />
-            </Navbar>
+            </ThemeWrapper>
           }
         />
         <Route path="/login" element={<Login />} />
@@ -26,9 +26,9 @@ function AppRouter() {
         <Route
           path="/product/:id/:name"
           element={
-            <Navbar>
+            <ThemeWrapper>
               <Product />
-            </Navbar>
+            </ThemeWrapper>
           }
         />
       </Routes>
