@@ -32,6 +32,7 @@ const NavbarItems = () => {
   const [searchValue, setSearchValue] = React.useState('');
   const [findData, setFindData] = React.useState<IProduct[]>([]);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [notFound, setNotFound] = React.useState(false);
   const { getAssessTokenFromLocalStorage, buildGeminiPrompt, getProducts } =
     React.useContext(RestfulApiContext);
   //   const AI = new GoogleGenAI({ apiKey: GeminiKey });
@@ -65,6 +66,7 @@ const NavbarItems = () => {
 
   const handleProductClick = async (product: IProduct) => {
     setSearchActive(false);
+    setNotFound(false);
     setSearchValue('');
     setFindData([]);
     setIsLoading(false);
@@ -102,6 +104,11 @@ const NavbarItems = () => {
             });
             console.log('Response:', res);
             setFindData(res.data.results);
+            if (res.data.results.length === 0) {
+              setNotFound(true);
+            } else {
+              setNotFound(false);
+            }
           })
           .catch((err: any) => {
             console.log('Error:', err);
@@ -111,6 +118,7 @@ const NavbarItems = () => {
               type: 'error',
               duration: 2000,
             });
+            setNotFound(false);
             return err;
           })
           .finally(() => {
@@ -150,6 +158,7 @@ const NavbarItems = () => {
       // Reset search value when search is not active
       setSearchValue('');
       setFindData([]);
+      setNotFound(false);
       setIsLoading(false);
     }
     return () => {
@@ -391,6 +400,23 @@ const NavbarItems = () => {
                 </Flex>
               </Flex>
             ))}
+            {findData.length === 0 && notFound === true && (
+              <Flex
+                direction={'row'}
+                // key={index}
+                p={'8px'}
+                overflow="hidden"
+                bg={'background.1'}
+                h={24}
+                gap={5}
+                alignItems={'center'}
+                justifyContent={'center'}
+              >
+                <Text fontWeight="medium" mb={1} color={'black'}>
+                  No result found
+                </Text>
+              </Flex>
+            )}
           </Grid>
           {/* Backdrop */}
           <Flex

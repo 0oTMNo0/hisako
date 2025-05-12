@@ -131,7 +131,7 @@ const postTokenRefresh: IServiceCall = (queryParams, pathParams, body) => {
 const getProducts: IServiceCall = (queryParams, pathParams, body) => {
   return axios({
     method: GET,
-    url: BASE_URL + `/api/products/`,
+    url: BASE_URL + `/products/`,
     headers: {
       Authorization: `Bearer ` + getAssessTokenFromLocalStorage(),
     },

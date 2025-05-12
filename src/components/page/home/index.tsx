@@ -66,11 +66,12 @@ export default function Home() {
   const callDataForSwaper = () => {
     getProducts(
       {
-        page: 1,
-        colour: 'red',
+        // in_stock: true,
+        colour: 'Red',
+        // usage: 'Casual',
         sort: 'created',
-        subcategory: 'Dress',
-        usage: 'Party',
+        page: 1,
+        subcategory: 'Topwear',
       },
       {}
     ).then((res: any) => {
