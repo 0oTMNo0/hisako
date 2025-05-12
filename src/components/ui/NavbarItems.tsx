@@ -301,27 +301,74 @@ const NavbarItems = () => {
                         <Text
                           cursor="pointer"
                           color="black"
+                          w={'full'}
+                          textAlign={'center'}
+                          mt={5}
                           onClick={handleHomeClick}
                         >
                           SHOP
                         </Text>
+                        {/* a line */}
+                        <Box
+                          borderBottomWidth={2}
+                          borderColor="black"
+                          w={'full'}
+                          // px={16}
+                        />
                         <Text
                           cursor="pointer"
                           color="black"
+                          w={'full'}
+                          textAlign={'center'}
                           onClick={handleAboutClick}
                         >
                           ABOUT
                         </Text>
-                        <Text
+                        <Box
+                          borderBottomWidth={2}
+                          borderColor="black"
+                          w={'full'}
+                          // px={16}
+                        />
+                        {getAssessTokenFromLocalStorage() ? (
+                          <Text
+                            cursor="pointer"
+                            color="black"
+                            w={'full'}
+                            textAlign={'center'}
+                            onClick={handleLogoutClick}
+                          >
+                            LOGOUT
+                          </Text>
+                        ) : (
+                          <Text
+                            cursor="pointer"
+                            color="black"
+                            w={'full'}
+                            textAlign={'center'}
+                            onClick={handleLoginClick}
+                          >
+                            LOGIN
+                          </Text>
+                        )}
+                        {/* <Text
                           cursor="pointer"
                           color="black"
+                          w={'full'}
+                          textAlign={'center'}
                           onClick={() => {
                             setOpen(false);
                             navigate('/login');
                           }}
                         >
                           LOGIN
-                        </Text>
+                        </Text> */}
+                        <Box
+                          borderBottomWidth={2}
+                          borderColor="black"
+                          w={'full'}
+                          // px={16}
+                        />
                       </Flex>
                     </Drawer.Body>
                     <Drawer.Footer>

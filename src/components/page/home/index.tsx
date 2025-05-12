@@ -13,8 +13,6 @@ import 'swiper/css';
 import { useNavigate } from 'react-router-dom';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
 import { IProduct } from '@/constants/Global';
-import { set } from 'react-hook-form';
-import { it } from 'node:test';
 
 export default function Home() {
   const loadMoreRef = React.useRef<HTMLDivElement>(null);
@@ -129,13 +127,18 @@ export default function Home() {
           slidesPerView="auto"
           spaceBetween={30}
           freeMode={true}
-          style={{ paddingLeft: 30, paddingRight: 30 }}
+          style={{ paddingLeft: 30, paddingRight: 30, zIndex: 0 }}
         >
           {swaperData.map((item: IProduct, index: number) => (
             <SwiperSlide
               key={item.id}
               onClick={() => handleProductClick(item)}
-              style={{ width: '280px', height: '320px', position: 'relative' }}
+              style={{
+                width: '280px',
+                height: '320px',
+                position: 'relative',
+                // zIndex: -100,
+              }}
             >
               <Image
                 src={item.image}

@@ -1,8 +1,10 @@
+import { IconApple, IconFacebook, IconGoogle } from '@/assets/icons';
 import Ibutton from '@/components/ui/Ibutton';
 import IInput from '@/components/ui/Iinput';
 import Ititle from '@/components/ui/Ititle';
+import { Toaster, toaster } from '@/components/ui/toaster';
 import { RestfulApiContext } from '@/hooks/ResfulApiContext';
-import { Box, Field, Flex, Text } from '@chakra-ui/react';
+import { Box, Field, Flex, Icon, Text } from '@chakra-ui/react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -148,7 +150,13 @@ const Login = () => {
           </Text>
         </Flex>
       </Flex>
-      <Flex w="full" h="full" justifyContent="center" alignItems="center">
+      <Flex
+        w="full"
+        h="full"
+        justifyContent="center"
+        alignItems="center"
+        flexDirection={'column'}
+      >
         <Text
           onClick={() => navigate('/login/ResetPassword')}
           fontSize={'xs'}
@@ -157,7 +165,23 @@ const Login = () => {
         >
           OR CONTINUE WITH
         </Text>
+        <Flex
+          gap={5}
+          onClick={() => {
+            toaster.create({
+              title: 'coming soon',
+              description: 'this feature is not available yet',
+              duration: 2000,
+              type: 'warning',
+            });
+          }}
+        >
+          <IconGoogle />
+          <IconApple />
+          <IconFacebook />
+        </Flex>
       </Flex>
+      <Toaster />
     </Flex>
   );
 };
